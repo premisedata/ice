@@ -46,7 +46,8 @@ ice.factory('highchart', function() {
       text: 'Cost Per Hour'
     },
     legend: {
-        enabled: true
+        enabled: true,
+        maxHeight: 55
     },
     rangeSelector: {
         inputEnabled: false ,
@@ -1488,6 +1489,7 @@ function summaryCtrl($scope, $location, usage_db, highchart) {
         {name: "Account"},
         {name: "Region"},
         {name: "Product"},
+        {name: "ResourceGroup"},
         {name: "Operation"},
         {name: "UsageType"}
     ],
@@ -1514,6 +1516,7 @@ function summaryCtrl($scope, $location, usage_db, highchart) {
           account: {selected: $scope.selected_accounts, from: $scope.accounts},
           region: {selected: $scope.selected_regions, from: $scope.regions},
           product: {selected: $scope.selected_products, from: $scope.products},
+          resourceGroup: {selected: $scope.selected_resourceGroups, from: $scope.resourceGroups},
           operation: {selected: $scope.selected_operations, from: $scope.operations},
           usageType: {selected: $scope.selected_usageTypes, from: $scope.usageTypes}
         });
@@ -1608,6 +1611,13 @@ function summaryCtrl($scope, $location, usage_db, highchart) {
   }
 
   $scope.productsChanged = function() {
+    if ($scope.showResourceGroups)
+      $scope.updateResourceGroups();
+    else
+      $scope.updateOperations();
+  }
+
+  $scope.resourceGroupsChanged = function() {
       $scope.updateOperations();
   }
 
@@ -1626,9 +1636,18 @@ function summaryCtrl($scope, $location, usage_db, highchart) {
     });
   }
 
+  $scope.updateResourceGroups = function() {
+    usage_db.getResourceGroups($scope, function(data){
+      $scope.updateOperations();
+    });
+  }
+
   $scope.updateProducts = function() {
     usage_db.getProducts($scope, function(data){
-      $scope.updateOperations();
+      if ($scope.showResourceGroups)
+        $scope.updateResourceGroups();
+      else
+        $scope.updateOperations();
     });
   }
 
